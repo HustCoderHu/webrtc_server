@@ -5,6 +5,24 @@ var sendFileBtn = document.getElementById("sendFileBtn");
 var files = document.getElementById("files");
 var rtc = SkyRTC();
 
+
+// const video = document.getElementById('me');
+const fullscreenBtn = document.getElementById('fullscreenBtn');
+
+function toggleFullScreen() {
+  if (!document.fullscreenElement) {  
+    videos.requestFullscreen();
+  } else {
+    if (document.exitFullscreen) {  
+      document.exitFullscreen();
+    }
+  }
+}
+
+fullscreenBtn.addEventListener('click', () => {
+  toggleFullScreen();
+});
+
 /**********************************************************/
 sendBtn.onclick = function (event) {
     var msgIpt = document.getElementById("msgIpt"),
@@ -126,4 +144,5 @@ rtc.on('data_channel_message', function (channel, socketId, message) {
     msgs.appendChild(p);
 });
 //连接WebSocket服务器
-rtc.connect("wss:" + window.location.href.substring(window.location.protocol.length).split('#')[0]+"/wss", window.location.hash.slice(1));
+rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], window.location.hash.slice(1));
+// rtc.connect("wss:" + window.location.href.substring(window.location.protocol.length).split('#')[0]+"/wss", window.location.hash.slice(1));
