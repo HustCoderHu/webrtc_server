@@ -16,6 +16,8 @@ function SkyRTC() {
     this.rooms = {};
     // 加入房间
     this.on('__join', function (data, socket) {
+        console.log("__join data:");
+        console.log(data);
 
         console.log("房间里有" + this.sockets.length + "人");
 
@@ -56,6 +58,9 @@ function SkyRTC() {
     });
 
     this.on('__ice_candidate', function (data, socket) {
+        console.log("__ice_candidate data:");
+        console.log(data);
+
         var soc = this.getSocket(data.socketId);
 
         if (soc) {
@@ -75,6 +80,9 @@ function SkyRTC() {
     });
 
     this.on('__offer', function (data, socket) {
+        console.log("__offer data:");
+        console.log(data);
+
         var soc = this.getSocket(data.socketId);
 
         if (soc) {
@@ -90,6 +98,9 @@ function SkyRTC() {
     });
 
     this.on('__answer', function (data, socket) {
+        console.log("__answer data:");
+        console.log(data);
+
         var soc = this.getSocket(data.socketId);
         if (soc) {
             soc.send(JSON.stringify({
@@ -105,10 +116,14 @@ function SkyRTC() {
 
     // 发起邀请
     this.on('__invite', function (data) {
+        console.log("__invite data:");
+        console.log(data);
 
     });
     // 回应数据
     this.on('__ack', function (data) {
+        console.log("__ack data:");
+        console.log(data);
 
     });
 }
@@ -176,7 +191,7 @@ SkyRTC.prototype.init = function (socket) {
     that.addSocket(socket);
     //为新连接绑定事件处理器
     socket.on('message', function (data) {
-        console.log(data);
+        console.log("message: " + data);
         let json = JSON.parse(data);
         if (json.eventName) {
             that.emit(json.eventName, json.data, socket);
@@ -186,6 +201,7 @@ SkyRTC.prototype.init = function (socket) {
     });
     //连接关闭后从SkyRTC实例中移除连接，并通知其他连接
     socket.on('close', function () {
+        console.log("socket.on(close)");
         let i, m,
             room = socket.room,
             curRoom;
