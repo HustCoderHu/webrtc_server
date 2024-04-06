@@ -18,16 +18,24 @@ const SkyRTC = function () {
     const iceServer = {
         "iceServers": [
             {
-                "url": "stun:stun.l.google.com:19302"
+                "url": "stun:stun.miwifi.com:3478"
             },
-            {
-                "url": "stun:global.stun.twilio.com:3478"
-            },
-            {
-                "url": "turn:global.stun.twilio.com:3478",
-                "username": "79fdd6b3c57147c5cc44944344c69d85624b63ec30624b8674ddc67b145e3f3c",
-                "credential": "xjfTOLkVmDtvFDrDKvpacXU7YofAwPg6P6TXKiztVGw"
-            }
+            // {
+            //     "url": "stun:47.87.:3478",
+            //     "username": "",
+            //     "credential": ""
+            // }
+            // {
+            //     "url": "stun:stun.l.google.com:19302"
+            // },
+            // {
+            //     "url": "stun:global.stun.twilio.com:3478"
+            // },
+            // {
+            //     "url": "turn:global.stun.twilio.com:3478",
+            //     "username": "79fdd6b3c57147c5cc44944344c69d85624b63ec30624b8674ddc67b145e3f3c",
+            //     "credential": "xjfTOLkVmDtvFDrDKvpacXU7YofAwPg6P6TXKiztVGw"
+            // }
         ]
     };
     let packetSize = 1000;
@@ -103,6 +111,7 @@ const SkyRTC = function () {
         room = room || "";
         socket = this.socket = new WebSocket(server);
         socket.onopen = function () {
+            console.log("onopen send __join, room: " + room);
             socket.send(JSON.stringify({
                 "eventName": "__join",
                 "data": {
@@ -114,6 +123,7 @@ const SkyRTC = function () {
 
         socket.onmessage = function (message) {
             var json = JSON.parse(message.data);
+            console.log(JSON.stringify(json, null, 4));
             if (json.eventName) {
                 that.emit(json.eventName, json.data);
             } else {
@@ -140,6 +150,7 @@ const SkyRTC = function () {
         };
 
         this.on('_peers', function (data) {
+            console.log("on(_peers): " + data)
             //获取所有服务器上的
             that.connections = data.connections;
             that.me = data.you;
@@ -148,9 +159,10 @@ const SkyRTC = function () {
         });
 
         this.on("_ice_candidate", function (data) {
+            console.log("on(_ice_candidate): " + data)
             var candidate = new nativeRTCIceCandidate(data);
             var pc = that.peerConnections[data.socketId];
-            if (!pc || !pc.remoteDescription.type) {
+            if (!pc || !pc.remoteDescription || !pc.remoteDescription.type) {
                 //push candidate onto queue...
                 console.log("remote not set!")
             }
@@ -159,6 +171,7 @@ const SkyRTC = function () {
         });
 
         this.on('_new_peer', function (data) {
+            console.log("on(_new_peer): " + data)
             that.connections.push(data.socketId);
             var pc = that.createPeerConnection(data.socketId),
                 i, m;
@@ -167,6 +180,7 @@ const SkyRTC = function () {
         });
 
         this.on('_remove_peer', function (data) {
+            console.log("on(_remove_peer): " + data)
             var sendId;
             that.closePeerConnection(that.peerConnections[data.socketId]);
             delete that.peerConnections[data.socketId];
@@ -180,24 +194,29 @@ const SkyRTC = function () {
         });
 
         this.on('_offer', function (data) {
+            console.log("on(_offer): " + data)
             that.receiveOffer(data.socketId, data.sdp);
             that.emit("get_offer", data);
         });
 
         this.on('_answer', function (data) {
+            console.log("on(_answer): " + data)
             that.receiveAnswer(data.socketId, data.sdp);
             that.emit('get_answer', data);
         });
 
         this.on('send_file_error', function (error, socketId, sendId, file) {
+            console.log("on(send_file_error): " + data)
             that.cleanSendFile(sendId, socketId);
         });
 
         this.on('receive_file_error', function (error, sendId) {
+            console.log("on(receive_file_error): " + data)
             that.cleanReceiveFile(sendId);
         });
 
         this.on('ready', function () {
+            console.log("on(ready): " + data)
             that.createPeerConnections();
             that.addStreams();
             that.addDataChannels();
@@ -356,6 +375,14 @@ const SkyRTC = function () {
     skyrtc.prototype.createPeerConnection = function (socketId) {
         var that = this;
         var pc = new PeerConnection(iceServer);
+        // const sender = pc.getSenders()[0];
+        // const params = sender.getParameters();
+        // if (!params.encodings) {
+        //     params.encodings = [{}];
+        // }
+        // params.encodings[0].maxBitrate = 4000 * 1000;
+        // sender.setParameters(params);
+
         this.peerConnections[socketId] = pc;
         pc.onicecandidate = function (evt) {
             if (evt.candidate)
