@@ -16,7 +16,7 @@ server.listen(port, hostname, function () {
 
 
 app.get('/', function (req, res) {
-    res.sendfile(__dirname + '/index.html');
+    res.sendFile(__dirname + '/index.html');
 });
 
 SkyRTC.rtc.on('new_connect', function (socket) {

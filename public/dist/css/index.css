@@ -12,12 +12,14 @@ html, body {
     top: 0;
     bottom: 0;
     right: 0;
+    height: 40%;
     overflow: auto;
 }
 
 #videos video {
-    display: inline-block;
-    width: 32%;
+    /* display: inline-block; */
+    width: 70%;
+    /* height: 150%; */
 }
 
 #chat {

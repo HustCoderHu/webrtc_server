@@ -13,9 +13,7 @@ function toggleFullScreen() {
   if (!document.fullscreenElement) {  
     videos.requestFullscreen();
   } else {
-    if (document.exitFullscreen) {  
-      document.exitFullscreen();
-    }
+    document.exitFullscreen();
   }
 }
 
@@ -127,6 +125,11 @@ rtc.on('pc_add_stream', function (stream, socketId) {
     newVideo.setAttribute("class", "other");
     newVideo.setAttribute("autoplay", "autoplay");
     newVideo.setAttribute("id", id);
+    // set to full screen
+    // double to switch video_peer and video_me full screen
+    newVideo.ondblclick = function () {
+        toggleFullScreen();
+    }
     videos.appendChild(newVideo);
     rtc.attachStream(stream, id);
 });
@@ -144,5 +147,11 @@ rtc.on('data_channel_message', function (channel, socketId, message) {
     msgs.appendChild(p);
 });
 //连接WebSocket服务器
-rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], window.location.hash.slice(1));
-// rtc.connect("wss:" + window.location.href.substring(window.location.protocol.length).split('#')[0]+"/wss", window.location.hash.slice(1));
+
+const url = window.location.href.substring(window.location.protocol.length)
+const split_url = url.split('#')[0]
+console.log('url: ' + url)
+console.log('split_url: ' + split_url) // ws://x.com/
+
+// rtc.connect("ws:" + window.location.href.substring(window.location.protocol.length).split('#')[0], window.location.hash.slice(1));
+rtc.connect("wss:" + split_url + "webrtc_signal", window.location.hash.slice(1));
