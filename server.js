@@ -6,7 +6,8 @@ const SkyRTC = require('./public/dist/js/SkyRTC.js').listen(server);
 const port = process.env.PORT || 3000;
 const hostname = "0.0.0.0";
 
-app.use(express.static(path.join(__dirname, 'public')), null);
+app.use(express.static(path.join(__dirname, 'public')));
+// app.use(express.static(path.join(__dirname, 'public')), null);
 
 
 server.listen(port, hostname, function () {
@@ -19,31 +20,31 @@ app.get('/', function (req, res) {
 });
 
 SkyRTC.rtc.on('new_connect', function (socket) {
-    console.log('创建新连接');
+    console.log('new_connect 创建新连接');
 });
 
 SkyRTC.rtc.on('remove_peer', function (socketId) {
-    console.log(socketId + "用户离开");
+    console.log("remove_peer: " + socketId + " 用户离开");
 });
 
 SkyRTC.rtc.on('new_peer', function (socket, room) {
-    console.log("新用户" + socket.id + "加入房间" + room);
+    console.log("new_peer 新用户 " + socket.id + " 加入房间 " + room);
 });
 
 SkyRTC.rtc.on('socket_message', function (socket, msg) {
-    console.log("接收到来自" + socket.id + "的新消息：" + msg);
+    console.log("socket_message 接收到来自" + socket.id + " 的新消息：" + msg);
 });
 
 SkyRTC.rtc.on('ice_candidate', function (socket, ice_candidate) {
-    console.log("接收到来自" + socket.id + "的ICE Candidate");
+    console.log("ice_candidate 接收到来自" + socket.id + " 的ICE Candidate");
 });
 
 SkyRTC.rtc.on('offer', function (socket, offer) {
-    console.log("接收到来自" + socket.id + "的Offer");
+    console.log("offer 接收到来自" + socket.id + " 的Offer");
 });
 
 SkyRTC.rtc.on('answer', function (socket, answer) {
-    console.log("接收到来自" + socket.id + "的Answer");
+    console.log("answer 接收到来自" + socket.id + " 的Answer");
 });
 
 SkyRTC.rtc.on('error', function (error) {
